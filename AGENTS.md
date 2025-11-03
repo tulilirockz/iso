@@ -43,7 +43,7 @@ This document provides essential information for coding agents working with the 
   - `bluefin-system.just` - System management recipes
 
 ### ISO Variants and Architecture
-- **ISO Variants**: 
+- **ISO Variants**:
   - `gts` - Grand Touring Support (stable with extended support)
   - `stable` - Current stable release
   - `latest` - Latest features (may be beta/unstable)
