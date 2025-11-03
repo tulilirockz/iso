@@ -2,19 +2,12 @@
 name: Build ISOs (Live Anaconda)
 
 "on":
-  workflow_dispatch:
+  workflow_call:
     inputs:
       image_version:
         description: 'Which image version to build'
-        type: choice
+        type: string
         required: true
-        default: 'all'
-        options:
-          - lts
-          - lts-hwe
-          - gts
-          - stable
-          - all
       upload_artifacts:
         description: 'Upload ISOs as job artifacts'
         type: boolean
@@ -23,6 +16,13 @@ name: Build ISOs (Live Anaconda)
         description: 'Upload ISOs to Cloudflare R2'
         type: boolean
         default: true
+    secrets:
+      R2_ACCESS_KEY_ID_2025:
+        required: true
+      R2_SECRET_ACCESS_KEY_2025:
+        required: true
+      R2_ENDPOINT_2025:
+        required: true
   pull_request:
     paths:
       - ".github/workflows/reusable-build-iso-anaconda.yml"
@@ -44,8 +44,8 @@ jobs:
         id: set-matrix
         run: |
           # Define the matrix based on the input selection
-          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-            case "${{ github.event.inputs.image_version }}" in
+          if [[ "${{ github.event_name }}" == "workflow_call" ]]; then
+            case "${{ inputs.image_version }}" in
               "lts")
                 matrix='{"include":[
                   {"platform":"amd64","flavor":"main","image_version":"lts"},
@@ -196,7 +196,7 @@ jobs:
           echo "output_directory=$OUTPUT_DIRECTORY" >> "${GITHUB_OUTPUT}"
 
       - name: Upload to Job Artifacts
-        if: github.ref_name == 'testing' || (github.event_name == 'workflow_dispatch' && github.event.inputs.upload_artifacts)
+        if: inputs.upload_artifacts
         uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5
         with:
           name: ${{ steps.image_ref.outputs.artifact_format }}
@@ -204,7 +204,7 @@ jobs:
           path: ${{ steps.rename.outputs.output_directory }}
 
       - name: Upload to CloudFlare
-        if: github.event_name != 'pull_request' && (github.event_name != 'workflow_dispatch' || github.event.inputs.upload_r2)
+        if: inputs.upload_r2 && github.event_name != 'pull_request'
         shell: bash
         env:
           RCLONE_CONFIG_R2_TYPE: s3

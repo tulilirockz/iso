@@ -13,6 +13,88 @@ Workflows and configuration files needed to build bootable Bluefin ISOs for inst
 
 ![ISO go nomnom](https://github.com/user-attachments/assets/2feeb772-713f-40b3-81e8-3f93b157fa13)
 
+## Workflow Structure
+
+The ISO build system consists of independent, focused workflows that can be triggered individually or as a group:
+
+```
+┌──────────────────────────────────────────────────────────────┐
+│                     Individual Workflows                      │
+│                 (Can be triggered separately)                 │
+└──────────────────────────────────────────────────────────────┘
+
+┌─────────────────────┐  ┌─────────────────────┐
+│  build-iso-lts      │  │  build-iso-lts-hwe  │
+│                     │  │                     │
+│ ✓ workflow_dispatch │  │ ✓ workflow_dispatch │
+│ ✓ schedule (cron)   │  │ ✓ schedule (cron)   │
+│ ✓ upload options    │  │ ✓ upload options    │
+│                     │  │                     │
+│ Builds: LTS ISOs    │  │ Builds: LTS-HWE ISOs│
+│ - amd64 × main      │  │ - amd64 × main      │
+│ - amd64 × gdx       │  │ - arm64 × main      │
+│ - arm64 × main      │  │                     │
+│ - arm64 × gdx       │  │                     │
+└─────────┬───────────┘  └─────────┬───────────┘
+          │                        │
+          └────────┬───────────────┘
+                   │
+          ┌────────▼────────┐
+          │  calls reusable │
+          │    workflow     │
+          └────────┬────────┘
+                   │
+┌─────────────────────┐  ┌─────────────────────┐
+│  build-iso-gts      │  │  build-iso-stable   │
+│                     │  │                     │
+│ ✓ workflow_dispatch │  │ ✓ workflow_dispatch │
+│ ✓ schedule (cron)   │  │ ✓ schedule (cron)   │
+│ ✓ upload options    │  │ ✓ upload options    │
+│                     │  │                     │
+│ Builds: GTS ISOs    │  │ Builds: Stable ISOs │
+│ - amd64 × main      │  │ - amd64 × main      │
+│ - amd64 × nvidia-open│ │ - amd64 × nvidia-open│
+└─────────┬───────────┘  └─────────┬───────────┘
+          │                        │
+          └────────┬───────────────┘
+                   │
+          ┌────────▼────────┐
+          │  calls reusable │
+          │    workflow     │
+          └─────────────────┘
+
+═══════════════════════════════════════════════════════════════
+
+┌──────────────────────────────────────────────────────────────┐
+│                   Orchestration Workflow                      │
+│              (Calls all individual workflows)                 │
+└──────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────┐
+│                    build-iso-all                             │
+│                   "Build All ISOs"                           │
+│                                                              │
+│ ✓ workflow_dispatch                                         │
+│ ✓ schedule (cron)                                           │
+│ ✓ upload options                                            │
+│                                                              │
+│ Orchestrates all 4 workflows in parallel:                   │
+│ ├─► build-iso-lts                                           │
+│ ├─► build-iso-lts-hwe                                       │
+│ ├─► build-iso-gts                                           │
+│ └─► build-iso-stable                                        │
+└─────────────────────────────────────────────────────────────┘
+
+Schedule: All workflows run at 2am UTC on the 1st of each month
+```
+
+### Key Features
+- **Tight Scoping:** Each workflow only builds its designated ISOs
+- **Independent Execution:** Each workflow can run independently
+- **Orchestration:** The "Build All ISOs" workflow calls all others
+- **Flexible Upload:** Control artifact and R2 uploads per execution
+- **Consistent Scheduling:** All workflows on same monthly schedule (cron: `0 2 1 * *`)
+
 ## ISO Variants
 
 The following ISO variants are built:
@@ -34,19 +116,26 @@ Each variant supports multiple flavors:
 
 ## Building ISOs
 
-ISOs are built automatically via GitHub Actions workflows:
+ISOs are built automatically via GitHub Actions workflows. Each variant has its own dedicated workflow.
 
 ### Manual Build
-Trigger a workflow dispatch with your desired image version:
-1. Go to Actions → "Build ISOs (Live Anaconda)"
-2. Click "Run workflow"
-3. Select the image version to build (lts, lts-hwe, gts, stable, or all)
-4. Choose upload options
+Trigger individual workflow dispatches for specific variants:
+1. Go to Actions
+2. Select a workflow:
+   - "Build LTS ISOs" - for LTS variant
+   - "Build LTS-HWE ISOs" - for LTS-HWE variant
+   - "Build GTS ISOs" - for GTS variant
+   - "Build Stable ISOs" - for Stable variant
+   - "Build All ISOs" - to build all variants
+3. Click "Run workflow"
+4. Choose upload options:
+   - `upload_artifacts` - Upload ISOs as job artifacts (default: false)
+   - `upload_r2` - Upload ISOs to CloudFlare R2 (default: true)
 
 ### Automatic Build
-ISOs are built automatically when:
-- Changes are made to ISO configuration files
-- Triggered by the LTS workflow
+ISOs are built automatically:
+- **Monthly schedule:** All workflows run at 2am UTC on the 1st of every month
+- **On changes:** When ISO configuration files are modified (via pull requests)
 
 ## Repository Structure
 
@@ -54,9 +143,13 @@ ISOs are built automatically when:
 .
 ├── .github/workflows/       # GitHub Actions workflows
 │   ├── build-iso-lts.yml   # LTS ISO build workflow
-│   ├── reusable-build-iso-anaconda.yml  # Main ISO build workflow
-│   ├── validate-brewfiles.yml  # Validate Homebrew files
-│   └── validate-flatpaks.yml   # Validate Flatpak lists
+│   ├── build-iso-lts-hwe.yml  # LTS-HWE ISO build workflow
+│   ├── build-iso-gts.yml   # GTS ISO build workflow
+│   ├── build-iso-stable.yml  # Stable ISO build workflow
+│   ├── build-iso-all.yml   # Orchestrates all ISO builds
+│   ├── reusable-build-iso-anaconda.yml  # Core reusable ISO build workflow
+│   ├── validate-flatpaks.yml   # Validate Flatpak lists
+│   └── validate-renovate.yml   # Validate Renovate config
 ├── iso_files/               # ISO configuration files
 │   ├── configure_iso_anaconda.sh  # Standard ISO configuration
 │   ├── configure_lts_iso_anaconda.sh  # LTS ISO configuration

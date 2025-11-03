@@ -1,0 +1,52 @@
+---
+name: Build All ISOs
+on:
+  workflow_dispatch:
+    inputs:
+      upload_artifacts:
+        description: 'Upload ISOs as job artifacts'
+        type: boolean
+        default: false
+      upload_r2:
+        description: 'Upload ISOs to Cloudflare R2'
+        type: boolean
+        default: true
+  schedule:
+    - cron: '0 2 1 * *'  # 2am UTC on the 1st of every month
+
+jobs:
+  build-iso-lts:
+    name: Build LTS ISOs
+    uses: ./.github/workflows/reusable-build-iso-anaconda.yml
+    secrets: inherit
+    with:
+      image_version: lts
+      upload_artifacts: ${{ github.event_name == 'workflow_dispatch' && inputs.upload_artifacts || false }}
+      upload_r2: ${{ github.event_name == 'workflow_dispatch' && inputs.upload_r2 || true }}
+
+  build-iso-lts-hwe:
+    name: Build LTS-HWE ISOs
+    uses: ./.github/workflows/reusable-build-iso-anaconda.yml
+    secrets: inherit
+    with:
+      image_version: lts-hwe
+      upload_artifacts: ${{ github.event_name == 'workflow_dispatch' && inputs.upload_artifacts || false }}
+      upload_r2: ${{ github.event_name == 'workflow_dispatch' && inputs.upload_r2 || true }}
+
+  build-iso-gts:
+    name: Build GTS ISOs
+    uses: ./.github/workflows/reusable-build-iso-anaconda.yml
+    secrets: inherit
+    with:
+      image_version: gts
+      upload_artifacts: ${{ github.event_name == 'workflow_dispatch' && inputs.upload_artifacts || false }}
+      upload_r2: ${{ github.event_name == 'workflow_dispatch' && inputs.upload_r2 || true }}
+
+  build-iso-stable:
+    name: Build Stable ISOs
+    uses: ./.github/workflows/reusable-build-iso-anaconda.yml
+    secrets: inherit
+    with:
+      image_version: stable
+      upload_artifacts: ${{ github.event_name == 'workflow_dispatch' && inputs.upload_artifacts || false }}
+      upload_r2: ${{ github.event_name == 'workflow_dispatch' && inputs.upload_r2 || true }}

@@ -1,5 +1,5 @@
 ---
-name: Build LTS ISOs
+name: Build GTS ISOs
 on:
   workflow_dispatch:
     inputs:
@@ -15,11 +15,11 @@ on:
     - cron: '0 2 1 * *'  # 2am UTC on the 1st of every month
 
 jobs:
-  build-iso-lts:
-    name: Build LTS ISOs
+  build-iso-gts:
+    name: Build GTS ISOs
     uses: ./.github/workflows/reusable-build-iso-anaconda.yml
     secrets: inherit
     with:
-      image_version: lts
+      image_version: gts
       upload_artifacts: ${{ github.event_name == 'workflow_dispatch' && inputs.upload_artifacts || false }}
       upload_r2: ${{ github.event_name == 'workflow_dispatch' && inputs.upload_r2 || true }}
