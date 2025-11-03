@@ -1,0 +1,55 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:best-practices",
+  ],
+
+  // Do not rebase when the default branch is updated
+  "rebaseWhen": "never",
+
+  // Custom manager for Justfile image references
+  customManagers: [
+    {
+      customType: 'regex',
+      managerFilePatterns: [
+        '/^Justfile$/',
+      ],
+      matchStrings: [
+        '(?<depName>.+?)\\s:=\\s"(?<packageName>\\S+):(?<currentValue>\\S+)@(?<currentDigest>sha256:[a-f0-9]+?)"',
+      ],
+      datasourceTemplate: 'docker',
+    },
+  ],
+
+  "packageRules": [
+    // Auto-merge GitHub Actions digest updates
+    {
+      "automerge": true,
+      "matchManagers": ["github-actions"],
+      "matchUpdateTypes": ["digest"]
+    },
+    // Auto-merge pin updates
+    {
+      "automerge": true,
+      "matchUpdateTypes": ["pin", "pinDigest"]
+    },
+    // Do not auto-merge Titanoboa (uses @main branch)
+    {
+      "matchPackageNames": ["ublue-os/titanoboa"],
+      "automerge": false,
+      "enabled": false
+    },
+    // Auto-merge rechunker digest updates
+    {
+      "automerge": true,
+      "matchUpdateTypes": ["digest"],
+      "matchPackageNames": ["ghcr.io/hhd-dev/rechunk"],
+    },
+    // Group all GitHub Actions updates together
+    {
+      "matchManagers": ["github-actions"],
+      "groupName": "GitHub Actions",
+      "separateMinorPatch": false
+    }
+  ]
+}
