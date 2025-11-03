@@ -53,7 +53,7 @@ The ISO build system consists of independent, focused workflows that can be trig
 │                     │  │                     │
 │ Builds: GTS ISOs    │  │ Builds: Stable ISOs │
 │ - amd64 × main      │  │ - amd64 × main      │
-│ - amd64 × nvidia    │  │ - amd64 × nvidia    │
+│ - amd64 × nvidia-open│ │ - amd64 × nvidia-open│
 └─────────┬───────────┘  └─────────┬───────────┘
           │                        │
           └────────┬───────────────┘
