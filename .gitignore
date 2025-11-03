@@ -1,0 +1,35 @@
+# Build artifacts
+*_build*/
+*.iso
+*.iso-CHECKSUM
+previous.manifest.json
+changelog.md
+output.env
+
+# Generated files
+iso_files/bluefin.repo
+
+# Temporary files
+*.tmp
+*.temp
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+*.egg-info/
+
+# Pre-commit
+.pre-commit-config.yaml.backup
