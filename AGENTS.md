@@ -483,7 +483,7 @@ Before committing:
    ```bash
    # Install yamllint if not already available
    pip install yamllint
-   
+
    # Validate your workflow file
    yamllint .github/workflows/build-iso-custom.yml
    yamllint .github/workflows/reusable-build-iso-anaconda.yml
