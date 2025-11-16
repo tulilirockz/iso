@@ -314,7 +314,7 @@ The `build-iso-lts.yml` is a simple caller:
 
 **CRITICAL: All caller workflows MUST follow this exact pattern without deviation.**
 
-All ISO build caller workflows (LTS, GTS, Stable, LTS-HWE, Cosmic, etc.) follow a **strict, consistent structure**. This pattern ensures maintainability, consistency, and proper security configuration.
+All ISO build caller workflows (LTS, GTS, Stable, LTS-HWE, etc.) follow a **strict, consistent structure**. This pattern ensures maintainability, consistency, and proper security configuration.
 
 #### Required Structure
 
