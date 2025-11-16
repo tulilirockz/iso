@@ -80,12 +80,6 @@ jobs:
                   {"platform":"amd64","flavor":"nvidia-open","image_version":"stable"}
                 ]}'
                 ;;
-              "cosmic")
-                # Cosmic variant: builds ONLY Cosmic ISOs from ghcr.io/castrojo/bluefin-cosmic:latest
-                matrix='{"include":[
-                  {"platform":"amd64","flavor":"main","image_version":"cosmic"}
-                ]}'
-                ;;
               "all")
                 # "all" is reserved for testing - builds all variants
                 matrix='{"include":[
@@ -173,16 +167,10 @@ jobs:
           FLAVOR: ${{ matrix.flavor }}
         run: |
           set -eoux pipefail
-          if [[ "${{ matrix.image_version }}" == "cosmic" ]]; then
-            # Cosmic variant uses ghcr.io/castrojo/bluefin-cosmic:latest
-            image_ref="ghcr.io/castrojo/bluefin-cosmic"
-            artifact_format="bluefin-cosmic-${{ matrix.image_version }}-$(uname -m)"
-          else
-            # Standard variants use the Just recipe to determine image name
-            image_name=$(just image_name "bluefin" "${{ matrix.image_version}}" "${{ matrix.flavor}}")
-            image_ref="${IMAGE_REGISTRY}/${image_name}"
-            artifact_format="$image_name-${{ matrix.image_version }}-$(uname -m)"
-          fi
+          # Standard variants use the Just recipe to determine image name
+          image_name=$(just image_name "bluefin" "${{ matrix.image_version}}" "${{ matrix.flavor}}")
+          image_ref="${IMAGE_REGISTRY}/${image_name}"
+          artifact_format="$image_name-${{ matrix.image_version }}-$(uname -m)"
           KARGS="NONE"
           echo "image_ref=$image_ref" >> "${GITHUB_OUTPUT}"
           echo "artifact_format=$artifact_format" >> "${GITHUB_OUTPUT}"
@@ -198,7 +186,7 @@ jobs:
         id: build
         uses: ublue-os/titanoboa@main
         with:
-          image-ref: ${{ steps.image_ref.outputs.image_ref }}:${{ matrix.image_version == 'cosmic' && 'latest' || matrix.image_version }}
+          image-ref: ${{ steps.image_ref.outputs.image_ref }}:${{ matrix.image_version }}
           flatpaks-list: ${{ github.workspace }}/flatpaks/system-flatpaks.list
           hook-post-rootfs: ${{ (matrix.image_version == 'lts' || matrix.image_version == 'lts-hwe') && format('{0}/iso_files/configure_lts_iso_anaconda.sh', github.workspace) || format('{0}/iso_files/configure_iso_anaconda.sh', github.workspace) }}
           kargs: ${{ steps.image_ref.outputs.kargs }}

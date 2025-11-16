@@ -314,7 +314,7 @@ The `build-iso-lts.yml` is a simple caller:
 
 **CRITICAL: All caller workflows MUST follow this exact pattern without deviation.**
 
-All ISO build caller workflows (LTS, GTS, Stable, LTS-HWE, Cosmic, etc.) follow a **strict, consistent structure**. This pattern ensures maintainability, consistency, and proper security configuration.
+All ISO build caller workflows (LTS, GTS, Stable, LTS-HWE, etc.) follow a **strict, consistent structure**. This pattern ensures maintainability, consistency, and proper security configuration.
 
 #### Required Structure
 
@@ -447,7 +447,7 @@ When creating or modifying a caller workflow, verify:
 4. **Inheritance**: Secrets and permissions flow correctly from repository to reusable workflow
 5. **Scalability**: Adding new variants is straightforward and low-risk
 
-**Reference workflows**: See `build-iso-gts.yml`, `build-iso-stable.yml`, `build-iso-lts.yml`, or `build-iso-cosmic.yml` for examples of the correct pattern.
+**Reference workflows**: See `build-iso-gts.yml`, `build-iso-stable.yml`, or `build-iso-lts.yml` for examples of the correct pattern.
 
 ## Adding a New ISO Workflow for Custom Images
 
