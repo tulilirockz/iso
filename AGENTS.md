@@ -447,7 +447,7 @@ When creating or modifying a caller workflow, verify:
 4. **Inheritance**: Secrets and permissions flow correctly from repository to reusable workflow
 5. **Scalability**: Adding new variants is straightforward and low-risk
 
-**Reference workflows**: See `build-iso-gts.yml`, `build-iso-stable.yml`, `build-iso-lts.yml`, or `build-iso-cosmic.yml` for examples of the correct pattern.
+**Reference workflows**: See `build-iso-gts.yml`, `build-iso-stable.yml`, or `build-iso-lts.yml` for examples of the correct pattern.
 
 ## Adding a New ISO Workflow for Custom Images
 
