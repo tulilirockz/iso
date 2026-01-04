@@ -208,4 +208,4 @@ echo -e "$ENROLLMENT_PASSWORD\n$ENROLLMENT_PASSWORD" | mokutil --import "$SECURE
 %end
 EOF
 
-sed -i -e "s/Fedora/Bluefin/g" -e "s/CentOS/Bluefin/g" /usr/share/applications/org.fedoraproject.welcome-screen.desktop
+sed -i -e "s/Fedora/Bluefin/g" -e "s/CentOS/Bluefin/g" /usr/share/anaconda/gnome/org.fedoraproject.welcome-screen.desktop
