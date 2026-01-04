@@ -210,3 +210,5 @@ mokutil --timeout -1 || :
 echo -e "$ENROLLMENT_PASSWORD\n$ENROLLMENT_PASSWORD" | mokutil --import "$SECUREBOOT_KEY" || :
 %end
 EOF
+
+sed -i "s@Welcome to.*@Welcome to Bluefin@g" /usr/share/applications/org.fedoraproject.welcome-screen.desktop
